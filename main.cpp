@@ -1,5 +1,4 @@
 #include<iostream>
-#include<GLFW/glfw3.h>
 #include "Sand.hpp"
 #include "Screen.hpp"
 

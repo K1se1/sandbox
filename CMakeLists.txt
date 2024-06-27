@@ -7,9 +7,10 @@ find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
+add_library(glad "C:/msys64/mingw64/lib/glad/include/glad/glad.h" "C:/msys64/mingw64/lib/glad/src/glad.c")
 add_executable(sandbox main.cpp)
 add_library(Screen STATIC Screen.hpp Screen.cpp)
-target_link_libraries(Screen glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY})
+target_link_libraries(Screen glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY})
 target_link_libraries(sandbox Screen)
 
 
