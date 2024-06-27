@@ -1,13 +1,11 @@
-#include <gl/glut.h>
-#include<gl/gl.h>
-#include<gl/glu.h>
-#include <math.h>
-#include<random>
+#include<iostream>
+#include<GLFW/glfw3.h>
 #include "Sand.hpp"
-
+#include "Screen.hpp"
 
 int main(int argc, char *argv[])
 {
-    Particles::Sand test;  
-    return 0;
+    Graphics::Screen test;
+    test.Init();
+    test.Display();
 }
