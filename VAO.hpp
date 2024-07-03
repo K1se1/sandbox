@@ -10,6 +10,7 @@ namespace Graphics
         GLuint ID;
         public:
         VAO();
+        void Init();
         void LinkVBO(VBO& VBO, GLuint layout);
         void Bind();
         void UnBind();

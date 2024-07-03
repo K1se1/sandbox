@@ -13,9 +13,10 @@ class Shader
 {
     private:
     GLuint ID;
-    std::string GetFileContent(const char* filename);
+    std::string GetFileContent(std::string filename);
     public:
-    Shader(const char* vertFile, const char* fragFile);
+    Shader();
+    void Init(std::string vertFile, std::string fragFile);
     void Activate();
     void Delete();
     GLuint GetID();

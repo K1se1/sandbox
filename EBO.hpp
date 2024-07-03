@@ -9,7 +9,8 @@ namespace Graphics
     private:
         GLuint ID;
     public:
-        EBO(GLuint* indices, GLsizeiptr size);
+        EBO();
+        void Init(GLuint* indices, GLsizeiptr size);
         void Bind();
         void UnBind();
         void Delete();

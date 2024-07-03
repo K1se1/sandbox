@@ -1,7 +1,7 @@
 #include "Shader.hpp"
 namespace Graphics
 {
-    std::string Shader::GetFileContent(const char* filename)
+    std::string Shader::GetFileContent(std::string filename)
     {
         std::ifstream file(filename, std::ios::binary); // открываем файл в бинарном режиме
         if(file)
@@ -16,7 +16,7 @@ namespace Graphics
         }
         throw errno;
     }
-    Shader::Shader(const char* vertFile, const char* fragFile)
+    void Shader::Init(std::string vertFile, std::string fragFile)
     {
         // Счиьываем код шейдеров
         std::string VertCode = GetFileContent(vertFile);
@@ -55,4 +55,5 @@ namespace Graphics
     {
         return ID;
     }
+    Shader::Shader(): ID(0) {}
 }

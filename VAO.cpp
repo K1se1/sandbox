@@ -4,6 +4,9 @@ namespace Graphics
 {
     VAO::VAO()
     {
+    }
+    void VAO::Init()
+    {
         glGenVertexArrays(1, &ID);
     }
     void VAO::LinkVBO(VBO& VBO, GLuint layout)
