@@ -71,7 +71,7 @@ namespace Graphics
         }
         glfwSwapBuffers(_window); // меняем местами передний и задний буффер
         glfwPollEvents();
-        Sleep(16); //  ограничение частоты кадров
+        //Sleep(16); //  ограничение частоты кадров
     }
     Screen::~Screen()
     {

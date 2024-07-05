@@ -14,11 +14,12 @@ add_library(Screen STATIC Screen.hpp Screen.cpp)
 add_library(VBO STATIC VBO.hpp VBO.cpp)
 add_library(VAO STATIC VAO.hpp VAO.cpp)
 add_library(EBO STATIC EBO.hpp EBO.cpp)
+add_library(GameField STATIC GameField.hpp GameField.cpp)
 target_link_libraries(Screen glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY} Shader VBO VAO EBO)
 target_link_libraries(Shader glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY})
 target_link_libraries(VBO glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY})
 target_link_libraries(VAO glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY} VBO)
 target_link_libraries(EBO glad glfw ${OPENGL_glu_LIBRARY} ${OPENGL_gl_LIBRARY})
 target_link_libraries(sandbox Screen Shader)
-
+target_link_libraries(sandbox GameField)
 
