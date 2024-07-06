@@ -1,6 +1,9 @@
-#define SAND 3
-#define FSAND 2
+#define SAND 5
+#define FSAND 4
 #define VOID 0
+#define WATER 2
+#define FWATER 1
+#define WOOD 6
 #include<vector>
 #include<random>
 #include "Point.hpp"

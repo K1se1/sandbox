@@ -1,6 +1,5 @@
 #include "GameField.hpp"
 
-
 namespace Core 
 {
     GameField::GameField(int size)
@@ -22,17 +21,19 @@ namespace Core
     std::vector<std::vector<int>> GameField::DoTick() 
     {
         std::vector<std::vector<int>> OldGameFieldArr =_GameFieldArr;
-        for(int i = 0; i < _size; ++i)
+        for(int k =0; k <3;++k)
         {
-            for(int j =_size-1; j >= 0; --j)
+        OldGameFieldArr =_GameFieldArr;
+        for(int j = 0; j < _size; ++j)
+        {
+            for(int i =_size-1; i >= 0; --i)
             {
                 switch(OldGameFieldArr[i][j])
                 { 
                 case VOID:
                     break;
-                case (FSAND || SAND):
-                    Point temp;
-                    if(j+1 < _size && OldGameFieldArr[i][j+1] == VOID)
+                case FSAND:
+                    if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
                     {
                         _GameFieldArr[i][j] = VOID;
                         if(j+1 == _size-1 ||_GameFieldArr[i][j+2] == SAND)
@@ -40,27 +41,66 @@ namespace Core
                         else
                             _GameFieldArr[i][j+1] = FSAND;
                     }
-                    else if(j+1 == _size || OldGameFieldArr[i][j+1] == SAND)
-                    {
-                        if(i > 0 && i+1 < _size)
+                    else if(j == _size-1 ||_GameFieldArr[i][j+1] == SAND)
+                        _GameFieldArr[i][j] = SAND;
+                     break;
+                case SAND:
+                        if(j < _size-1 && _GameFieldArr[i][j+1] != SAND)
                         {
-                            if(OldGameFieldArr[i-1][j+1] == VOID)
+                            _GameFieldArr[i][j] = FSAND;
+                            break; 
+                        }
+                        if(j+1 < _size && i > 0 && i+1 < _size)
+                        {
+                            bool left = (_GameFieldArr[i-1][j+1] == VOID && _GameFieldArr[i-1][j] == VOID);
+                            bool right = (_GameFieldArr[i+1][j+1] == VOID && _GameFieldArr[i+1][j] == VOID);
+                            if(left && right)
                             {
                                 _GameFieldArr[i][j] = VOID; 
-                                _GameFieldArr[i-1][j] = SAND; 
+                                _GameFieldArr[i+1-(rand()%2)*2][j+1] = FSAND; 
                             }
-                            else if(OldGameFieldArr[i+1][j+1] == VOID)
+                            else if(left)
                             {
                                 _GameFieldArr[i][j] = VOID; 
-                                _GameFieldArr[i+1][j] = SAND; 
+                                _GameFieldArr[i-1][j+1] = FSAND; 
+                            }
+                            else if(right)
+                            {
+                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i+1][j+1] = FSAND; 
                             }
                         }
-                    
+                         break;
+                case WATER:
+                    if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
+                    {
+                        _GameFieldArr[i][j] = VOID;
+                        _GameFieldArr[i][j+1] = WATER;
                     }
+                    else if(i > 0 && i+1 < _size &&  _GameFieldArr[i][j+1] != VOID)
+                        {
+                            if(_GameFieldArr[i-1][j] == VOID && _GameFieldArr[i+1][j] == VOID)
+                            {
+                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i+1-(rand()%2)*2][j] = WATER; 
+                            }
+                            else if( _GameFieldArr[i-1][j] == VOID)
+                            {
+                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i-1][j] = WATER; 
+                            }
+                            else if( _GameFieldArr[i+1][j] == VOID)
+                            {
+                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i+1][j] = WATER; 
+                            }
+                        }
+                        break;
                 }
 
 
             }
+        }
         }
         return _GameFieldArr;
     }
