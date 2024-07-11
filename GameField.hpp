@@ -6,6 +6,7 @@
 #define WOOD 6
 #include<vector>
 #include<random>
+#include<set>
 #include "Point.hpp"
 namespace Core
 {
@@ -13,12 +14,14 @@ namespace Core
     {
         private:
         std::vector<std::vector<int>> _GameFieldArr;
+        std::set<Point> _ActiveParticles;
         int _size;
         public:
         GameField();
         GameField(int size);
         void AddParticle(int particle, const Point& coords);
         std::vector<std::vector<int>> DoTick();
+        void HardUpdate();
         ~GameField();
 
     };

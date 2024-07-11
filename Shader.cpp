@@ -45,6 +45,7 @@ namespace Graphics
     void Shader::Activate()
     {
         glUseProgram(ID);
+        vertColorLocation = glGetUniformLocation(ID, "OurColor");
     }
 
     void Shader::Delete()
@@ -54,6 +55,10 @@ namespace Graphics
     GLuint Shader::GetID()
     {
         return ID;
+    }
+    void Shader::SetColor(RGBColor color)
+    {
+        glUniform4f(vertColorLocation, color.r, color.g, color.b, 1.f);
     }
     Shader::Shader(): ID(0) {}
 }

@@ -38,8 +38,9 @@ namespace Graphics
 
     }
 
-    void Screen::DrawQuad(int x, int y, int gameSize)
+    void Screen::DrawQuad(int x, int y, int gameSize, RGBColor color)
     {
+        shader.SetColor(color);
         GLfloat quadsSides = (2.0f / gameSize); // сторона квадрата
         GLfloat ratio = GLfloat(_width)/_height; //  чтобы стороны были пропорциональные
         GLfloat vertices[] = {-1.0f+(quadsSides*x), ratio*2.f-1.f- (quadsSides*(y+1)*ratio), 0.0f, // левый нижний
@@ -53,7 +54,7 @@ namespace Graphics
         vbo.Delete();
     }
 
-    void Screen::Display(int gameSize, std::vector<Point> pixels)
+    void Screen::Display(int gameSize, std::vector<std::pair<Point, RGBColor>> pixels)
     {
 
         if (glfwWindowShouldClose(_window)) // Если окно закрывают - завершаем
@@ -67,7 +68,7 @@ namespace Graphics
         shader.Activate(); // активируем шейдеры
         for(const auto& pixel: pixels) // проходимся по координатам каждого пикселя в массиве
         {
-            DrawQuad(pixel.x, pixel.y, gameSize); // рисуем пиксель
+            DrawQuad(pixel.first.x, pixel.first.y, gameSize, pixel.second); // рисуем пиксель
         }
         glfwSwapBuffers(_window); // меняем местами передний и задний буффер
         glfwPollEvents();
