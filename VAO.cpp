@@ -1,5 +1,5 @@
 #include "VAO.hpp"
-
+#include<iostream>
 namespace Graphics
 {
     VAO::VAO()
@@ -9,12 +9,14 @@ namespace Graphics
     {
         glGenVertexArrays(1, &ID);
     }
-    void VAO::LinkVBO(VBO& VBO, GLuint layout)
+    void VAO::LinkVBO(VBO& VBO, GLuint layout, GLuint divisor)
     {
-        VBO.Bind();
-        glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
         glEnableVertexAttribArray(layout);
+        VBO.Bind();
+        std::cout << glGetError();
+        glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
         VBO.UnBind();
+        glVertexAttribDivisor(layout, divisor);
     }
     void VAO::Bind()
     {

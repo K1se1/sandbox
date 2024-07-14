@@ -3,12 +3,26 @@
 #include <windows.h>
 namespace Graphics
 {
-    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window")
+    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window"), _gameSize(400)
     {
-
+        GLfloat quadsSides = (2.0f / _gameSize); // сторона квадрата
+        GLfloat ratio = GLfloat(_width)/_height; //  чтобы стороны были пропорциональны
+        quadVert = new GLfloat[12]{-1.0f, ratio*2.f-1.f- (quadsSides*ratio), 0.0f, // левый нижний
+                            -1.0f, ratio*2.f-1.f, 0.0f, // левый верхний
+                            -1.0f+quadsSides, ratio*2.f-1.f, 0.0f, // правый верхний
+                            -1.0f+quadsSides,  ratio*2.f-1.f-(quadsSides*ratio), 0.0f}; // правый нижний
+        _vertmap.resize(_gameSize);
+        for(int x = 0; x < _gameSize; ++x)
+        {
+            _vertmap[x].resize(_gameSize);
+            for(int y  =0; y < _gameSize; ++y)
+            {
+                _vertmap[x][y] = new GLfloat[3] {quadsSides*x, -quadsSides*y*ratio, 0.0f}; // смещение
+            }
+        }
     }
-    Screen::Screen(int height, int width, std::string name, RGBColor& color):  _height(height), _width(width), 
-                                                                                _color{color}, _name(name)
+    Screen::Screen(int height, int width, std::string name, RGBColor& color, unsigned int gameSize):  _height(height), _width(width), 
+                                                                                _color{color}, _name(name), _gameSize(gameSize)
         {
 
                                                                                 }
@@ -35,20 +49,15 @@ namespace Graphics
                             0, 2, 3 };
         vao.Bind();
         ebo.Init(indices, sizeof(indices)); // инициализируем буффер обхода индексов 
+        shader.Activate();
 
     }
 
     void Screen::DrawQuad(int x, int y, int gameSize, RGBColor color)
     {
         shader.SetColor(color);
-        GLfloat quadsSides = (2.0f / gameSize); // сторона квадрата
-        GLfloat ratio = GLfloat(_width)/_height; //  чтобы стороны были пропорциональные
-        GLfloat vertices[] = {-1.0f+(quadsSides*x), ratio*2.f-1.f- (quadsSides*(y+1)*ratio), 0.0f, // левый нижний
-                            -1.0f+(quadsSides*x), ratio*2.f-1.f- (quadsSides*y*ratio), 0.0f, // левый верхний
-                            -1.0f+(quadsSides*(x+1)), ratio*2.f-1.f- (quadsSides*y*ratio), 0.0f, // правый верхний
-                            -1.0f+(quadsSides*(x+1)),  ratio*2.f-1.f- (quadsSides*(y+1)*ratio), 0.0f}; // правый нижний
-        VBO vbo(vertices, sizeof(vertices)); 
-        vao.LinkVBO(vbo, 0);
+        VBO vbo(_vertmap[x][y], 12*sizeof(GLfloat)); 
+        vao.LinkVBO(vbo, 1, 0);
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         vbo.Delete();
@@ -56,7 +65,14 @@ namespace Graphics
 
     void Screen::Display(int gameSize, std::vector<std::pair<Point, RGBColor>> pixels)
     {
+        
 
+        GLfloat* translations = new GLfloat[pixels.size()*3];
+        for(int i =0; i < pixels.size()*3; i+=3)
+        {
+            for(int j =0; j < 3; ++j)
+                translations[i+j] = _vertmap[pixels[i/3].first.x][pixels[i/3].first.y][j]; //Супер опасно, беру указатель с приватного члена класса, главное ниче не сломать 
+        }
         if (glfwWindowShouldClose(_window)) // Если окно закрывают - завершаем
 	    {
             glfwDestroyWindow(_window);
@@ -64,14 +80,24 @@ namespace Graphics
 		    glfwTerminate();
 	    }
         glClearColor(_color.r, _color.g, _color.b, 1.0f); // установка цвета фона
-        glClear(GL_COLOR_BUFFER_BIT);
-        shader.Activate(); // активируем шейдеры
-        for(const auto& pixel: pixels) // проходимся по координатам каждого пикселя в массиве
-        {
-            DrawQuad(pixel.first.x, pixel.first.y, gameSize, pixel.second); // рисуем пиксель
-        }
+        glClear(GL_COLOR_BUFFER_BIT); 
+        VBO iVbo(translations, 3*sizeof(GLfloat)*pixels.size());
+        VBO quadVbo(quadVert, 12*sizeof(GLfloat));
+        vao.Bind();
+        vao.LinkVBO(quadVbo, 1, 0); 
+        vao.LinkVBO(iVbo, 0, 1);
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, pixels.size());
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        vao.UnBind();
+        // for(const auto& pixel: pixels) // проходимся по координатам каждого пикселя в массиве
+        // {
+        //     DrawQuad(pixel.first.x, pixel.first.y, gameSize, pixel.second); // рисуем пиксель
+        // }
         glfwSwapBuffers(_window); // меняем местами передний и задний буффер
         glfwPollEvents();
+        iVbo.Delete();
+        quadVbo.Delete();
+        delete[] translations;
     }
     Screen::~Screen()
     {

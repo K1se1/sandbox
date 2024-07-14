@@ -22,13 +22,16 @@ namespace Graphics
         VAO vao; // массив вершин
         EBO ebo; //  буффер индексов
         Shader shader; // шейдеры
+        std::vector<std::vector<GLfloat*>> _vertmap;
+        GLfloat* quadVert;
+        unsigned int _gameSize;
         void DrawQuad(int x, int y, int gameSize, RGBColor); // отрисовываем квадрат по координатам
         public:
         Screen();
-        Screen(int height, int width, std::string name, RGBColor &color);
+        Screen(int height, int width, std::string name, RGBColor &color, unsigned int gameSize);
         ~Screen();
         void Init(); // инициализация окна
-        void Display(int gameSize, std::vector<std::pair<Point, RGBColor>> pixels); // рисуем один кадр
+        void Display(int gameSize, std::vector<std::pair<Point, RGBColor>> piiels); // рисуем один кадр
         bool isClosed(); // закрыто ли окно
     };
 }

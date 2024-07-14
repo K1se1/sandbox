@@ -23,7 +23,7 @@ namespace Core
     std::vector<std::vector<int>> GameField::DoTick() 
     {
         std::vector<std::vector<int>> OldGameFieldArr =_GameFieldArr;
-        for(int k =0; k <1;++k)
+        for(int k =0; k <7;++k)
         {
         std::set<Point> NewActiveParticles;
         OldGameFieldArr =_GameFieldArr;
@@ -36,39 +36,39 @@ namespace Core
                 case VOID:
                     break;
                 case SAND:
-                    if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
+                    if(j < _size-1 && _GameFieldArr[i][j+1] < SAND)
                     {
                         int r = rand() % 2 +1,s; // для неоднородного падения песка
                         for(s = 1; s < r; ++s)
                         {
-                        if(_GameFieldArr[i][j+s] != VOID)
+                        if(_GameFieldArr[i][j+s] >= SAND)
                             break;
                         }
-                        _GameFieldArr[i][j] = VOID;
+                        _GameFieldArr[i][j] = _GameFieldArr[i][j+s-1];
                         _GameFieldArr[i][j+s-1] = SAND;
                         NewActiveParticles.insert(Point{i, j+s-1});
                     }
   
                     else if(j+1 < _size && i > 0 && i+1 < _size)
                     {
-                        bool left = (_GameFieldArr[i-1][j+1] == VOID && _GameFieldArr[i-1][j] == VOID);
-                        bool right = (_GameFieldArr[i+1][j+1] == VOID && _GameFieldArr[i+1][j] == VOID);
+                        bool left = (_GameFieldArr[i-1][j+1] < SAND && _GameFieldArr[i-1][j] < SAND);
+                        bool right = (_GameFieldArr[i+1][j+1] <SAND && _GameFieldArr[i+1][j] <SAND );
                         if(left && right)
                         {
                             int r =(rand()%2)*2;
-                            _GameFieldArr[i][j] = VOID; 
+                            _GameFieldArr[i][j] = _GameFieldArr[i+1-r][j+1] ; 
                             _GameFieldArr[i+1-r][j+1] = SAND;
                             NewActiveParticles.insert(Point{i+1-r, j+1}); 
                         }
                         else if(left)
                         {
-                            _GameFieldArr[i][j] = VOID; 
+                            _GameFieldArr[i][j] = _GameFieldArr[i-1][j+1]; 
                             _GameFieldArr[i-1][j+1] = SAND; 
                             NewActiveParticles.insert(Point{i-1, j+1});
                         }
                         else if(right)
                         {
-                            _GameFieldArr[i][j] = VOID; 
+                            _GameFieldArr[i][j] = _GameFieldArr[i+1][j+1]; 
                             _GameFieldArr[i+1][j+1] = SAND;
                             NewActiveParticles.insert(Point{i+1, j+1});
                         }

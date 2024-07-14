@@ -58,7 +58,7 @@ namespace Graphics
     }
     void Shader::SetColor(RGBColor color)
     {
-        glUniform4f(vertColorLocation, color.r, color.g, color.b, 1.f);
+        glUniform4f(vertColorLocation, color.r, color.g, color.b, 1.0f);
     }
     Shader::Shader(): ID(0) {}
 }

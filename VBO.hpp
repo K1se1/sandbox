@@ -9,6 +9,7 @@ namespace Graphics
         GLuint ID;
         public:
         VBO(GLfloat* vertices, GLsizeiptr size);
+        VBO(GLfloat** vertices, GLsizeiptr size);
         void Bind();
         void UnBind();
         void Delete();

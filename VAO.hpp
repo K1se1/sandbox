@@ -11,7 +11,7 @@ namespace Graphics
         public:
         VAO();
         void Init();
-        void LinkVBO(VBO& VBO, GLuint layout);
+        void LinkVBO(VBO& VBO, GLuint layout, GLuint divisor);
         void Bind();
         void UnBind();
         void Delete();
