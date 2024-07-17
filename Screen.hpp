@@ -4,6 +4,7 @@
 #include<string> 
 #include<cmath>
 #include<vector>
+#include<map>
 #include "VAO.hpp"
 #include "VBO.hpp"
 #include "EBO.hpp"
@@ -31,7 +32,8 @@ namespace Graphics
         Screen(int height, int width, std::string name, RGBColor &color, unsigned int gameSize);
         ~Screen();
         void Init(); // инициализация окна
-        void Display(int gameSize, std::vector<std::pair<Point, RGBColor>> piiels); // рисуем один кадр
+        void Display(int gameSize, std::map<RGBColor, std::vector<Point>> pixels); // рисуем один кадр
         bool isClosed(); // закрыто ли окно
+        GLFWwindow* GetWindowId();
     };
 }

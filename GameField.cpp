@@ -22,8 +22,18 @@ namespace Core
     }
     std::vector<std::vector<int>> GameField::DoTick() 
     {
+        Point temp = _LastCursorPosition;
+
+        if(MouseIsPressed)
+        {
+            AddParticle(WATER, temp);
+            if(temp.x < _size) temp.x+=1;
+            AddParticle(WATER, temp);
+            if(temp.y < _size) temp.y+=1;
+            AddParticle(WATER, temp);
+        }
         std::vector<std::vector<int>> OldGameFieldArr =_GameFieldArr;
-        for(int k =0; k <7;++k)
+        for(int k =0; k <1;++k)
         {
         std::set<Point> NewActiveParticles;
         OldGameFieldArr =_GameFieldArr;
@@ -82,7 +92,7 @@ namespace Core
 
                     if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
                     {
-                        int r = rand() % 2 +1,s; // для неоднородного падения воды
+                        int r = rand() % 10 +1,s; // для неоднородного падения воды
                         for(s = 1; s < r; ++s)
                         {
                         if(_GameFieldArr[i][j+s] != VOID)
@@ -117,32 +127,101 @@ namespace Core
                                         break;
                                     }
                                 }
+                                int s = 1;
+                                int down = 0;
                                 if(l >= r)
                                     prioretyleft = true;
                                 else
                                     prioretyright = true;
-                                int r =(rand()%2)*2;
+                                if(prioretyleft  || ( prioretyleft &&  prioretyright))
+                                {
+                                for(s = 2; s <= 6; ++s)
+                                {
+                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                        break;
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
+                                    {
+                                        for(; down<= 10; ++down)
+                                        {
+                                            if(j+down >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                                break;
+                                        }
+                                        down-=1;
+                                    }
+                                }
+                                s-=1;
+                                }
+                                else if(prioretyright)
+                                {
+                                for(s = 2; s <= 6; ++s)
+                                {
+                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOID)
+                                        break;
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
+                                    {
+                                        for(; down<= 10; ++down)
+                                        {
+                                            if(j+down >= _size-1 ||_GameFieldArr[i-s][j+down] != VOID)
+                                                break;
+                                        }
+                                        down-=1;
+                                    }
+                                }
+                                s-=1;
+                                }
                                 _GameFieldArr[i][j] = VOID; 
-                                _GameFieldArr[i+(prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright)][j] = WATER;
-                                NewActiveParticles.insert(Point{i+(prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright), j}); 
+                                _GameFieldArr[i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s)][j+down] = WATER;
+                                NewActiveParticles.insert(Point{i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s), j+down}); 
                             }
                             else if(left)
                             {
+                                int s =1 , down = 0;
+                                for(s = 2; s <= 6; ++s)
+                                {
+                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOID)
+                                        break;
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
+                                    {
+                                        for(; down<= 10; ++down)
+                                        {
+                                            if(j+down >= _size-1 ||_GameFieldArr[i-s][j+down] != VOID)
+                                                break;
+                                        }
+                                        down-=1;
+                                    }
+                                }
+                                s-=1;
                                 _GameFieldArr[i][j] = VOID; 
-                                _GameFieldArr[i-1][j] = WATER; 
-                                NewActiveParticles.insert(Point{i-1, j});
+                                _GameFieldArr[i-s][j+down] = WATER; 
+                                NewActiveParticles.insert(Point{i-s, j+down});
                             }
                             else if(right)
                             {
+                                int s = 1, down = 0;
+                                for(s = 2; s <= 6; ++s)
+                                {
+                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                        break;
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
+                                    {
+                                        for(; down<= 10; ++down)
+                                        {
+                                            if(j+down >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                                break;
+                                        }
+                                        down-=1;
+                                    }
+                                }
+                                s-=1;
                                 _GameFieldArr[i][j] = VOID; 
-                                _GameFieldArr[i+1][j] = WATER;
-                                NewActiveParticles.insert(Point{i+1, j});
+                                _GameFieldArr[i+s][j+down] = WATER;
+                                NewActiveParticles.insert(Point{i+s, j+down});
                             }
                             else
-                                NewActiveParticles.insert(Point{i, j});
+                               NewActiveParticles.insert(Point{i, j});
                         }
                         else
-                            NewActiveParticles.insert(Point{i, j});
+                           NewActiveParticles.insert(Point{i, j});
                         break;
 
 
@@ -166,5 +245,32 @@ namespace Core
             }
         }
     }
-
+    void GameField::Cursor_Position_Callback(GLFWwindow* window, double xPos, double yPos)
+    {
+        _LastCursorPosition.x = xPos;
+        _LastCursorPosition.y = yPos;
+    }
+    void GameField::Mouse_Button_Callback(GLFWwindow* window, int button, int action, int mods)
+    {
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        _LastCursorPosition.x = x;
+        _LastCursorPosition.y= y;
+        std::cout << _LastCursorPosition.x;
+    }
+    }
+    void GameField::SetMouseState(bool flag)
+    {
+        MouseIsPressed = flag;
+    }
+    bool GameField::GetMouseState()
+    {
+        return MouseIsPressed;
+    }
+    int GameField::GetSize()
+    {
+        return _size;
+    }
 }

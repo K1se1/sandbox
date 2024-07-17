@@ -13,7 +13,6 @@ namespace Graphics
     {
         glEnableVertexAttribArray(layout);
         VBO.Bind();
-        std::cout << glGetError();
         glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
         VBO.UnBind();
         glVertexAttribDivisor(layout, divisor);
