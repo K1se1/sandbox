@@ -26,11 +26,11 @@ namespace Core
 
         if(MouseIsPressed)
         {
-            AddParticle(WATER, temp);
+            AddParticle(SAND, temp);
             if(temp.x < _size) temp.x+=1;
-            AddParticle(WATER, temp);
+            AddParticle(SAND, temp);
             if(temp.y < _size) temp.y+=1;
-            AddParticle(WATER, temp);
+            AddParticle(SAND, temp);
         }
         std::vector<std::vector<int>> OldGameFieldArr =_GameFieldArr;
         for(int k =0; k <1;++k)
@@ -41,7 +41,7 @@ namespace Core
         {
                 int i = iter->x;
                 int j = iter->y;
-                switch(OldGameFieldArr[i][j])
+                switch(_GameFieldArr[i][j])
                 { 
                 case VOID:
                     break;
@@ -49,14 +49,28 @@ namespace Core
                     if(j < _size-1 && _GameFieldArr[i][j+1] < SAND)
                     {
                         int r = rand() % 2 +1,s; // для неоднородного падения песка
-                        for(s = 1; s < r; ++s)
+                        for(s = 1; s <= r; ++s)
                         {
                         if(_GameFieldArr[i][j+s] >= SAND)
                             break;
                         }
-                        _GameFieldArr[i][j] = _GameFieldArr[i][j+s-1];
-                        _GameFieldArr[i][j+s-1] = SAND;
-                        NewActiveParticles.insert(Point{i, j+s-1});
+                        s--;
+                        int temp;
+                        for(int r = 0; r <= s-1;++r)
+                        {
+                            temp = _GameFieldArr[i][j+r+1];
+                            _GameFieldArr[i][j+r+1] = _GameFieldArr[i][j+r];
+                            _GameFieldArr[i][j+r] = temp;
+                            if(_GameFieldArr[i][j+r] != VOID)
+                                NewActiveParticles.insert(Point{i, j+r});
+
+                        }
+                        // _GameFieldArr[i][j] = VOID;
+                        // _GameFieldArr[i][j+s-1] = _GameFieldArr[i][j+s];
+                        // _GameFieldArr[i][j+s] = SAND;
+                       // if(_GameFieldArr[i][j+s-1] != VOID && _GameFieldArr[i][j+s-1] != SAND)
+                         //   NewActiveParticles.insert(Point{i, j+s-1});
+                        NewActiveParticles.insert(Point{i, j+s});
                     }
   
                     else if(j+1 < _size && i > 0 && i+1 < _size)
@@ -68,19 +82,24 @@ namespace Core
                             int r =(rand()%2)*2;
                             _GameFieldArr[i][j] = _GameFieldArr[i+1-r][j+1] ; 
                             _GameFieldArr[i+1-r][j+1] = SAND;
-                            NewActiveParticles.insert(Point{i+1-r, j+1}); 
+                            NewActiveParticles.insert(Point{i+1-r, j+1});
+                            NewActiveParticles.insert(Point{i, j});
+                            
+
                         }
                         else if(left)
                         {
                             _GameFieldArr[i][j] = _GameFieldArr[i-1][j+1]; 
                             _GameFieldArr[i-1][j+1] = SAND; 
                             NewActiveParticles.insert(Point{i-1, j+1});
+                            NewActiveParticles.insert(Point{i, j});
                         }
                         else if(right)
                         {
                             _GameFieldArr[i][j] = _GameFieldArr[i+1][j+1]; 
                             _GameFieldArr[i+1][j+1] = SAND;
                             NewActiveParticles.insert(Point{i+1, j+1});
+                            NewActiveParticles.insert(Point{i, j});
                         }
                         else
                             NewActiveParticles.insert(Point{i, j});
@@ -89,7 +108,6 @@ namespace Core
                         NewActiveParticles.insert(Point{i, j});
                      break;
                 case WATER:
-
                     if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
                     {
                         int r = rand() % 10 +1,s; // для неоднородного падения воды
@@ -139,14 +157,9 @@ namespace Core
                                 {
                                     if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
                                         break;
-                                    if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
+                                    if(j+down+1 < _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
                                     {
-                                        for(; down<= 10; ++down)
-                                        {
-                                            if(j+down >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
-                                                break;
-                                        }
-                                        down-=1;
+                                        down++;
                                     }
                                 }
                                 s-=1;
@@ -159,12 +172,7 @@ namespace Core
                                         break;
                                     if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
                                     {
-                                        for(; down<= 10; ++down)
-                                        {
-                                            if(j+down >= _size-1 ||_GameFieldArr[i-s][j+down] != VOID)
-                                                break;
-                                        }
-                                        down-=1;
+                                        down++;
                                     }
                                 }
                                 s-=1;
@@ -182,12 +190,7 @@ namespace Core
                                         break;
                                     if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
                                     {
-                                        for(; down<= 10; ++down)
-                                        {
-                                            if(j+down >= _size-1 ||_GameFieldArr[i-s][j+down] != VOID)
-                                                break;
-                                        }
-                                        down-=1;
+                                        down++;
                                     }
                                 }
                                 s-=1;
@@ -204,12 +207,7 @@ namespace Core
                                         break;
                                     if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
                                     {
-                                        for(; down<= 10; ++down)
-                                        {
-                                            if(j+down >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
-                                                break;
-                                        }
-                                        down-=1;
+                                        down++;
                                     }
                                 }
                                 s-=1;
@@ -223,10 +221,35 @@ namespace Core
                         else
                            NewActiveParticles.insert(Point{i, j});
                         break;
+                case VIRUS:
+                    {
+                    NewActiveParticles.insert(Point{i, j});
+                    if(rand() % 3 == 0)
+                        break;
+                    int s = rand() % 3 -1;
+                    int r = rand() % 3 -1;
+                    if(i+s < _size && i+s >=0 && i+r < _size && i+r >=0 && _GameFieldArr[i+s][j+r] != VOID && _GameFieldArr[i+s][j+r] != VIRUS)
+                                _GameFieldArr[i+s][j+r] = VIRUS;
+                    break;
+                    }
+                case FIRE:
+                    if(rand() % 2  == 0)
+                    {
+                        _GameFieldArr[i][j] = VOID;
+                        break;
+                    }
+                    if(j-1 >= 0)
+                        _GameFieldArr[i][j-1] = FIRE;
+                    NewActiveParticles.insert(Point{i, j});
+                    NewActiveParticles.insert(Point{i, j-1});
+                    break;
+                    
+
 
 
             }
         }
+        std::cout << "\nParticles: " << NewActiveParticles.size() << " \n";
         _ActiveParticles = std::move(NewActiveParticles);
         }
         return _GameFieldArr;

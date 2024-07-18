@@ -1,9 +1,10 @@
 #define SAND 5
-#define FSAND 4
 #define VOID 0
 #define WATER 2
-#define FWATER 1
 #define WOOD 6
+#define ACID 
+#define VIRUS 30
+#define FIRE 31
 #include<vector>
 #include<random>
 #include<set>

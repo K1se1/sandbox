@@ -23,7 +23,7 @@ void add_cube(int size, Core::GameField& field, int material)
 int main(int argc, char *argv[])
 {
     int count = 0;
-    int size = 700;
+    int size = 500;
     Core::GameField field(size);
     add_cube(size, field, WATER);
      for(int i = size/2-size/3; i < size/2+size/3;++i)
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         {
             add_cube(size,field, WATER);
         }
-        if(count  > 1002)
+        if(count  > 5002)
         {
             count--;
         }
@@ -98,6 +98,10 @@ int main(int argc, char *argv[])
                             color = RGBColor{0.992F, 0.913f, 0.062f};
                         else if(f[i][j] == WOOD)
                             color = RGBColor{148, 123, 0};
+                        else if(f[i][j] == VIRUS)
+                            color = RGBColor{0.309F, 0.0F, 0.439F};
+                        else if(f[i][j] == FIRE)
+                            color = RGBColor{0.99F, (1.f/255.f)*(rand() % 255), 0.0F};
                         pixels[color].push_back(Point{i, j});
                     }
                 }
@@ -106,6 +110,7 @@ int main(int argc, char *argv[])
         test.Display(size, pixels);
          elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - now);
         // std::cout << "Time to display : " << elapsed.count() << "ms.\n";
+        //Sleep(700);
         count++;
 
     }

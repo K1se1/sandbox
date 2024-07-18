@@ -3,7 +3,7 @@
 #include <windows.h>
 namespace Graphics
 {
-    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window"), _gameSize(700)
+    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window"), _gameSize(500)
     {
         GLfloat quadsSides = (2.0f / _gameSize); // сторона квадрата
         GLfloat ratio = GLfloat(_width)/_height; //  чтобы стороны были пропорциональны
