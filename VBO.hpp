@@ -1,8 +1,9 @@
 #pragma once
-#include "C:/msys64/mingw64/lib/glad/include/glad/glad.h"
+#include "../glad/glad.h"
 
 namespace Graphics
 {
+    // Класс для буффера вершин
     class VBO
     {
         private:

@@ -1,42 +1,89 @@
 #include "GameField.hpp"
-#include<iostream>
 namespace Core 
 {
-    GameField::GameField(int size)
+    GameField::GameField(const int& size, GLFWwindow* window): InputState(window)
     {
         _size = size;
         _GameFieldArr.resize(_size);
+        _NoActiveTicks.resize(_size);
         for(auto& row: _GameFieldArr)
         {
             row = std::vector<int>(_size, 0);
         }
+        for(auto& row: _NoActiveTicks)
+        {
+            row = std::vector<int>(_size, 100);
+        }
     }
-        GameField::GameField(): GameField(1000)
+        GameField::GameField(GLFWwindow* window): GameField(1000, window)
     {
     }
     void GameField::AddParticle(int particle, const Point& coords)
     {
-        _ActiveParticles.insert(coords);
-        
+        Point temp = coords;
+        for(int i =-1; i <= 1; ++i )
+        {
+                for(int j =-1; j<=1; ++j)
+                {
+                    temp.x= coords.x+i;
+                    temp.y = coords.y+j;
+                    if(temp.x < _size && temp.x >=0 && temp.y < _size && temp.y>=0)
+                                    _ActiveParticles.insert(temp);
+                }
+        }
         _GameFieldArr.at(coords.x).at(coords.y) = particle;
     }
     std::vector<std::vector<int>> GameField::DoTick() 
     {
-        Point temp = _LastCursorPosition;
-
-        if(MouseIsPressed)
+        if(InputState.GetMouseState())
         {
-            AddParticle(SAND, temp);
-            if(temp.x < _size) temp.x+=1;
-            AddParticle(SAND, temp);
-            if(temp.y < _size) temp.y+=1;
-            AddParticle(SAND, temp);
+        int material = SAND;
+        switch(InputState.GetLastKey())
+        {
+            case GLFW_KEY_1:
+                material = SAND;
+                break;
+            case GLFW_KEY_2:
+                material = WATER;
+                break;
+            case GLFW_KEY_3:
+                material = WOOD;
+                break;    
+            case GLFW_KEY_4:
+                material = VIRUS;
+                break;
+            case GLFW_KEY_5:
+                material = FIRE;
+                break;
+            case GLFW_KEY_0:
+                material =VOID;
+                break;
+            default:
+             material = SAND;
+             break;
         }
-        std::vector<std::vector<int>> OldGameFieldArr =_GameFieldArr;
+        double x = InputState.GetCursorPos().first;
+        double y = InputState.GetCursorPos().second;
+        x/=1920.0f;
+        x*=_size;
+        y/=1080.0f;
+        y*=_size*(1080.0f/1920.0f);
+        y+=(_size*(1.0f -1080.0f/1920.0f));
+        int  brushSize = 4;
+        Point temp{int(x), int(y)};
+        for(int i =-brushSize; i <= brushSize; ++i )
+        {
+                for(int j =-brushSize; j<=brushSize; ++j)
+                {
+                    temp.x= x+i;
+                    temp.y = y+j;
+                    if(temp.x < _size && temp.x >=0 && temp.y < _size && temp.y>=0)
+                                    AddParticle(material, temp);
+                }
+        }
+        }
         for(int k =0; k <1;++k)
         {
-        std::set<Point> NewActiveParticles;
-        OldGameFieldArr =_GameFieldArr;
         for(auto iter = _ActiveParticles.begin(); iter != _ActiveParticles.end(); ++iter)
         {
                 int i = iter->x;
@@ -44,46 +91,50 @@ namespace Core
                 switch(_GameFieldArr[i][j])
                 { 
                 case VOID:
+                    _NoActiveTicks[i][j] = 100;
                     break;
                 case SAND:
                     if(j < _size-1 && _GameFieldArr[i][j+1] < SAND)
                     {
-                        int r = rand() % 2 +1,s; // для неоднородного падения песка
+                        for(int r=-1; r <= 1; ++r )
+                        {
+                            for(int s =-1; s<=1; ++s)
+                            {
+
+                            if(i+r < _size && i+r >=0 && j+s < _size && j+s>=0)
+                                    _NoActiveTicks[i+r][j+s] = 0;
+                            }
+                        }
+                        int r = rand() % 10 +1,s; // для неоднородного падения песка
                         for(s = 1; s <= r; ++s)
                         {
-                        if(_GameFieldArr[i][j+s] >= SAND)
+                        if(j+s >= _size || _GameFieldArr[i][j+s] >= SAND)
                             break;
                         }
-                        s--;
-                        int temp;
-                        for(int r = 0; r <= s-1;++r)
+                        r = rand() % 2;
+                        if((i+1-2*r) >= 0 && (i+1-2*r) < _size && _GameFieldArr[i+1-2*r][j+s-1]  < SAND)
                         {
-                            temp = _GameFieldArr[i][j+r+1];
-                            _GameFieldArr[i][j+r+1] = _GameFieldArr[i][j+r];
-                            _GameFieldArr[i][j+r] = temp;
-                            if(_GameFieldArr[i][j+r] != VOID)
-                                NewActiveParticles.insert(Point{i, j+r});
-
+                            _GameFieldArr[i][j] = _GameFieldArr[i+1-2*r][j+s-1];
+                            _GameFieldArr[i+1-2*r][j+s-1] = SAND;
+                            _NoActiveTicks[i+1-2*r][j+s-1] = 0;
                         }
-                        // _GameFieldArr[i][j] = VOID;
-                        // _GameFieldArr[i][j+s-1] = _GameFieldArr[i][j+s];
-                        // _GameFieldArr[i][j+s] = SAND;
-                       // if(_GameFieldArr[i][j+s-1] != VOID && _GameFieldArr[i][j+s-1] != SAND)
-                         //   NewActiveParticles.insert(Point{i, j+s-1});
-                        NewActiveParticles.insert(Point{i, j+s});
+                        else
+                        {
+                            _GameFieldArr[i][j] = _GameFieldArr[i][j+s-1];
+                            _GameFieldArr[i][j+s-1] = SAND;
+                           _NoActiveTicks[i][j+s-1] = 0;
+                        }
                     }
   
-                    else if(j+1 < _size && i > 0 && i+1 < _size)
+                    else if(j+1 < _size &&  _GameFieldArr[i][j+1] >= SAND)
                     {
-                        bool left = (_GameFieldArr[i-1][j+1] < SAND && _GameFieldArr[i-1][j] < SAND);
-                        bool right = (_GameFieldArr[i+1][j+1] <SAND && _GameFieldArr[i+1][j] <SAND );
+                        bool left = (i-1 >= 0 && _GameFieldArr[i-1][j+1] < SAND && _GameFieldArr[i-1][j] < SAND);
+                        bool right = (i+1 < _size && _GameFieldArr[i+1][j+1] <SAND && _GameFieldArr[i+1][j] <SAND );
                         if(left && right)
                         {
                             int r =(rand()%2)*2;
                             _GameFieldArr[i][j] = _GameFieldArr[i+1-r][j+1] ; 
                             _GameFieldArr[i+1-r][j+1] = SAND;
-                            NewActiveParticles.insert(Point{i+1-r, j+1});
-                            NewActiveParticles.insert(Point{i, j});
                             
 
                         }
@@ -91,42 +142,70 @@ namespace Core
                         {
                             _GameFieldArr[i][j] = _GameFieldArr[i-1][j+1]; 
                             _GameFieldArr[i-1][j+1] = SAND; 
-                            NewActiveParticles.insert(Point{i-1, j+1});
-                            NewActiveParticles.insert(Point{i, j});
                         }
                         else if(right)
                         {
                             _GameFieldArr[i][j] = _GameFieldArr[i+1][j+1]; 
                             _GameFieldArr[i+1][j+1] = SAND;
-                            NewActiveParticles.insert(Point{i+1, j+1});
-                            NewActiveParticles.insert(Point{i, j});
                         }
                         else
-                            NewActiveParticles.insert(Point{i, j});
+                        {
+                                _NoActiveTicks[i][j]++;
+                                break;
+                        }
+                        _NoActiveTicks[i][j] = 0;
+                        for(int r=-1; r <= 1; ++r )
+                        {
+                            for(int s =-1; s<=1; ++s)
+                            {
+
+                            if(i+r < _size && i+r >=0 && j+s < _size && j+s>=0)
+                                    _NoActiveTicks[i+r][j+s] = 0;
+                            }
+                        }
                     }
                     else
-                        NewActiveParticles.insert(Point{i, j});
+                        _NoActiveTicks[i][j]++;
                      break;
                 case WATER:
-                    if(j < _size-1 && _GameFieldArr[i][j+1] == VOID)
+                    if(j < _size-1 && _GameFieldArr[i][j+1] < WATER)
                     {
-                        int r = rand() % 10 +1,s; // для неоднородного падения воды
-                        for(s = 1; s < r; ++s)
+                        for(int r=-1; r <= 1; ++r )
                         {
-                        if(_GameFieldArr[i][j+s] != VOID)
+                            for(int s =-1; s<=1; ++s)
+                            {
+
+                            if(i+r < _size && i+r >=0 && j+s < _size && j+s>=0)
+                                    _NoActiveTicks[i+r][j+s] = 0;
+                            }
+                        }
+                        int r = rand() % 10 +1,s; // для неоднородного падения воды
+                        for(s = 1; s <= r; ++s)
+                        {
+                        if(j+s >= _size || _GameFieldArr[i][j+s] >= WATER)
                             break;
                         }
-                        _GameFieldArr[i][j] = VOID;
-                        _GameFieldArr[i][j+s-1] = WATER;
-                        NewActiveParticles.insert(Point{i, j+s-1});
+                        r = rand() % 2;
+                        if((i+1-2*r) >= 0 && (i+1-2*r) < _size && _GameFieldArr[i+1-2*r][j+s-1]  < WATER)
+                        {
+                            _GameFieldArr[i][j] = _GameFieldArr[i+1-2*r][j+s-1];
+                            _GameFieldArr[i+1-2*r][j+s-1] = WATER;
+                            _NoActiveTicks[i+1-2*r][j+s-1] = 0;
+                        }
+                        else
+                        {
+                            _GameFieldArr[i][j] = _GameFieldArr[i][j+s-1];
+                            _GameFieldArr[i][j+s-1] = WATER;
+                           _NoActiveTicks[i][j+s-1] = 0;
+                        }
                     }
-                    else if(i > 0 && i+1 < _size &&  (_GameFieldArr[i][j+1] != VOID || j < _size-1))
+                    else if((j < _size-1 ||_GameFieldArr[i][j+1] != VOID))
                         {
                             int r  =_size, l = _size;
                             bool prioretyleft = false;
                             bool prioretyright = false;
-                            bool left = (_GameFieldArr[i-1][j] == VOID);
-                            bool right = (_GameFieldArr[i+1][j] == VOID);
+                            bool left = (i > 0 && _GameFieldArr[i-1][j] == VOID);
+                            bool right = ( i+1 < _size &&  _GameFieldArr[i+1][j] == VOID);
                             if(left && right)
                             {
                                 for(int t = 0; t < i; ++t)
@@ -179,7 +258,7 @@ namespace Core
                                 }
                                 _GameFieldArr[i][j] = VOID; 
                                 _GameFieldArr[i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s)][j+down] = WATER;
-                                NewActiveParticles.insert(Point{i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s), j+down}); 
+                                _NoActiveTicks[i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s)][j+down] = 0;
                             }
                             else if(left)
                             {
@@ -196,7 +275,7 @@ namespace Core
                                 s-=1;
                                 _GameFieldArr[i][j] = VOID; 
                                 _GameFieldArr[i-s][j+down] = WATER; 
-                                NewActiveParticles.insert(Point{i-s, j+down});
+                                 _NoActiveTicks[i-s][j+down] = 0;
                             }
                             else if(right)
                             {
@@ -213,35 +292,80 @@ namespace Core
                                 s-=1;
                                 _GameFieldArr[i][j] = VOID; 
                                 _GameFieldArr[i+s][j+down] = WATER;
-                                NewActiveParticles.insert(Point{i+s, j+down});
+                               _NoActiveTicks[i+s][j+down] = 0;
                             }
                             else
-                               NewActiveParticles.insert(Point{i, j});
+                            {
+                               _NoActiveTicks[i][j]++;
+                               break;
+                            }
+                            for(int r=-1; r <= 1; ++r )
+                            {
+                                for(int s =-1; s<=1; ++s)
+                                {
+
+                                if(i+r < _size && i+r >=0 && j+s < _size && j+s>=0)
+                                    _NoActiveTicks[i+r][j+s] = 0;
+                                }
+                            }
                         }
                         else
-                           NewActiveParticles.insert(Point{i, j});
+                           _NoActiveTicks[i][j]++;
                         break;
                 case VIRUS:
                     {
-                    NewActiveParticles.insert(Point{i, j});
+                    bool flag = false;
                     if(rand() % 3 == 0)
                         break;
                     int s = rand() % 3 -1;
                     int r = rand() % 3 -1;
-                    if(i+s < _size && i+s >=0 && i+r < _size && i+r >=0 && _GameFieldArr[i+s][j+r] != VOID && _GameFieldArr[i+s][j+r] != VIRUS)
-                                _GameFieldArr[i+s][j+r] = VIRUS;
+                    for(int s =-1; s<= 1; ++s)
+                    {
+                    for(int r =-1; r<=1; ++r)
+                    {   
+                         if(i+s < _size && i+s >=0 && j+r < _size && j+r >=0 && _GameFieldArr[i+s][j+r] != VOID && _GameFieldArr[i+s][j+r] != VIRUS)
+                        {
+                                    flag = true;
+                                    if(rand()%2)
+                                    {
+                                    _GameFieldArr[i+s][j+r] = VIRUS;
+                                    _NoActiveTicks[i+s][j+r] = 0;
+                                    }
+                        }
+                    }
+                    if(!flag)  _NoActiveTicks[i][j] = 100;
+                    }
                     break;
                     }
                 case FIRE:
-                    if(rand() % 2  == 0)
+                    bool flag = false;
+                    if(rand() % 10  == 0)
                     {
                         _GameFieldArr[i][j] = VOID;
                         break;
                     }
-                    if(j-1 >= 0)
+                    if(j-1 >= 0 && _GameFieldArr[i][j-1] < FIRE && rand() %2 )
+                    {
                         _GameFieldArr[i][j-1] = FIRE;
-                    NewActiveParticles.insert(Point{i, j});
-                    NewActiveParticles.insert(Point{i, j-1});
+                        _NoActiveTicks[i][j-1] = 0;
+                        _GameFieldArr[i][j] = VOID;
+                    }
+                    for(int s =-1; s<= 1; ++s)
+                    {
+                    for(int r =-1; r<=1; ++r)
+                    {   
+                         if(i+s < _size && i+s >=0 && j+r < _size && j+r >=0 && (_GameFieldArr[i+s][j+r] == WOOD || _GameFieldArr[i+s][j+r] == FIRE || _GameFieldArr[i+s][j+r] == VIRUS) )
+                        {
+                            flag = true;
+                            if(rand()%2)
+                            {
+                                _GameFieldArr[i+s][j+r] = FIRE;
+                                _NoActiveTicks[i+s][j+r] = 0;
+                            }
+                        }
+                    }
+                    }
+
                     break;
                     
 
@@ -249,8 +373,20 @@ namespace Core
 
             }
         }
-        std::cout << "\nParticles: " << NewActiveParticles.size() << " \n";
-        _ActiveParticles = std::move(NewActiveParticles);
+        std::set<Point> NewActiveParticles;
+        int counter = 0;
+        for(int i = 0; i < _size;++i)
+        {
+            for(int j =0; j < _size;++j)
+            {
+                if(_NoActiveTicks[i][j] < 3)
+                {
+                    NewActiveParticles.insert(Point{i, j});
+                    counter++;
+                }
+            }
+        }
+        _ActiveParticles = NewActiveParticles;
         }
         return _GameFieldArr;
     }
@@ -259,38 +395,16 @@ namespace Core
     {}
     void GameField::HardUpdate()
     {
+        std::set<Point> NewActiveParticles;
         for(int i =0; i <_size; ++i)
         {
             for(int j =0; j <_size; ++j)
             {
                 if(_GameFieldArr[i][j] != VOID)
-                    _ActiveParticles.insert(Point{i, j});
+                    NewActiveParticles.insert(Point{i, j});
             }
         }
-    }
-    void GameField::Cursor_Position_Callback(GLFWwindow* window, double xPos, double yPos)
-    {
-        _LastCursorPosition.x = xPos;
-        _LastCursorPosition.y = yPos;
-    }
-    void GameField::Mouse_Button_Callback(GLFWwindow* window, int button, int action, int mods)
-    {
-        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-    {
-        double x, y;
-        glfwGetCursorPos(window, &x, &y);
-        _LastCursorPosition.x = x;
-        _LastCursorPosition.y= y;
-        std::cout << _LastCursorPosition.x;
-    }
-    }
-    void GameField::SetMouseState(bool flag)
-    {
-        MouseIsPressed = flag;
-    }
-    bool GameField::GetMouseState()
-    {
-        return MouseIsPressed;
+        _ActiveParticles = std::move(NewActiveParticles);
     }
     int GameField::GetSize()
     {

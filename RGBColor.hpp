@@ -1,8 +1,10 @@
 #pragma once
+// вспомогательная структура для цвета
 struct RGBColor
 {
     float r, g, b;
-    bool operator<(const RGBColor& c) const // магический оператор, сделан очень странно, но если что-нибудь поменять - все сломается
+    // нужен исключительно формально, чтобы можно было засунуть в контейнер с сортировкой
+    bool operator<(const RGBColor& c) const 
     {
         return r+g+b>c.r+c.g+c.b;
     }

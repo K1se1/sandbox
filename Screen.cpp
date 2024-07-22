@@ -3,7 +3,7 @@
 #include <windows.h>
 namespace Graphics
 {
-    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window"), _gameSize(500)
+    Screen::Screen(): _height(1080), _width(1920), _color{0.07f, 0.13f, 0.17f}, _name("Window"), _gameSize(450)
     {
         GLfloat quadsSides = (2.0f / _gameSize); // сторона квадрата
         GLfloat ratio = GLfloat(_width)/_height; //  чтобы стороны были пропорциональны
@@ -33,7 +33,7 @@ namespace Graphics
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_DECORATED, false); // окно без рамок
-        glfwSetInputMode(_window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
+       // glfwSetInputMode(_window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
         _window = glfwCreateWindow(_width, _height, "SandBox", NULL, NULL);  // создание окна
         if(_window == NULL)
         {
@@ -53,17 +53,7 @@ namespace Graphics
 
     }
 
-    void Screen::DrawQuad(int x, int y, int gameSize, RGBColor color)
-    {
-        shader.SetColor(color);
-        VBO vbo(_vertmap[x][y], 12*sizeof(GLfloat)); 
-        vao.LinkVBO(vbo, 1, 0);
-        vao.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        vbo.Delete();
-    }
-
-    void Screen::Display(int gameSize, std::map<RGBColor, std::vector<Point>> pixels)
+    void Screen::Display(int gameSize, const std::map<RGBColor, std::vector<Point>>& pixels)
     {
         
         if (glfwWindowShouldClose(_window)) // Если окно закрывают - завершаем

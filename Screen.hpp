@@ -1,5 +1,5 @@
 #pragma once
-#include "C:/msys64/mingw64/lib/glad/include/glad/glad.h"
+#include "../glad/glad.h" // замеенить путь
 #include<GLFW/glfw3.h>
 #include<string> 
 #include<cmath>
@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Point.hpp"
 #include "RGBColor.hpp"
+// класс для отрисовки игрового поля
 namespace Graphics
 {
     class Screen
@@ -26,13 +27,12 @@ namespace Graphics
         std::vector<std::vector<GLfloat*>> _vertmap;
         GLfloat* quadVert;
         unsigned int _gameSize;
-        void DrawQuad(int x, int y, int gameSize, RGBColor); // отрисовываем квадрат по координатам
         public:
         Screen();
         Screen(int height, int width, std::string name, RGBColor &color, unsigned int gameSize);
         ~Screen();
         void Init(); // инициализация окна
-        void Display(int gameSize, std::map<RGBColor, std::vector<Point>> pixels); // рисуем один кадр
+        void Display(int gameSize, const std::map<RGBColor, std::vector<Point>>& pixels); // рисуем один кадр
         bool isClosed(); // закрыто ли окно
         GLFWwindow* GetWindowId();
     };

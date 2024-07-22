@@ -1,5 +1,5 @@
 #pragma once
-#include "C:/msys64/mingw64/lib/glad/include/glad/glad.h"
+#include "../glad/glad.h"
 #include<string>
 #include<fstream>
 #include<sstream>
@@ -9,6 +9,7 @@
 namespace Graphics
 {
 
+// класс для считывания и инициализации вершинного и фрагментного шейдеров
 class Shader
 {
     private:

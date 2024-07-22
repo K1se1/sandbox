@@ -1,9 +1,10 @@
 #pragma once
 #include "VBO.hpp"
-#include "C:/msys64/mingw64/lib/glad/include/glad/glad.h"
+#include "../glad/glad.h"
 
 namespace Graphics
 {
+    // класс для массива вершин
     class VAO
     {
         private:
