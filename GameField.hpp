@@ -1,5 +1,5 @@
 #define SAND 5
-#define VOID 0
+#define VOIDP 0
 #define WATER 2
 #define WOOD 6
 #define ACID 

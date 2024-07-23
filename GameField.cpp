@@ -56,7 +56,7 @@ namespace Core
                 material = FIRE;
                 break;
             case GLFW_KEY_0:
-                material =VOID;
+                material =VOIDP;
                 break;
             default:
              material = SAND;
@@ -90,7 +90,7 @@ namespace Core
                 int j = iter->y;
                 switch(_GameFieldArr[i][j])
                 { 
-                case VOID:
+                case VOIDP:
                     _NoActiveTicks[i][j] = 100;
                     break;
                 case SAND:
@@ -199,18 +199,18 @@ namespace Core
                            _NoActiveTicks[i][j+s-1] = 0;
                         }
                     }
-                    else if((j < _size-1 ||_GameFieldArr[i][j+1] != VOID))
+                    else if((j < _size-1 ||_GameFieldArr[i][j+1] != VOIDP))
                         {
                             int r  =_size, l = _size;
                             bool prioretyleft = false;
                             bool prioretyright = false;
-                            bool left = (i > 0 && _GameFieldArr[i-1][j] == VOID);
-                            bool right = ( i+1 < _size &&  _GameFieldArr[i+1][j] == VOID);
+                            bool left = (i > 0 && _GameFieldArr[i-1][j] == VOIDP);
+                            bool right = ( i+1 < _size &&  _GameFieldArr[i+1][j] == VOIDP);
                             if(left && right)
                             {
                                 for(int t = 0; t < i; ++t)
                                 {
-                                if(_GameFieldArr[i-t][j+1] == VOID)
+                                if(_GameFieldArr[i-t][j+1] == VOIDP)
                                 {
                                     l =  t;
                                     break;
@@ -218,7 +218,7 @@ namespace Core
                                 }
                                 for(int t = 0; t < _size-i; ++t)
                                 {
-                                    if(_GameFieldArr[i+t][j+1] == VOID)
+                                    if(_GameFieldArr[i+t][j+1] == VOIDP)
                                     {
                                         r = t;
                                         break;
@@ -234,9 +234,9 @@ namespace Core
                                 {
                                 for(s = 2; s <= 6; ++s)
                                 {
-                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOIDP)
                                         break;
-                                    if(j+down+1 < _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
+                                    if(j+down+1 < _size-1  && _GameFieldArr[i+s][j+1+down] == VOIDP)
                                     {
                                         down++;
                                     }
@@ -247,16 +247,16 @@ namespace Core
                                 {
                                 for(s = 2; s <= 6; ++s)
                                 {
-                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOID)
+                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOIDP)
                                         break;
-                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOIDP)
                                     {
                                         down++;
                                     }
                                 }
                                 s-=1;
                                 }
-                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i][j] = VOIDP; 
                                 _GameFieldArr[i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s)][j+down] = WATER;
                                 _NoActiveTicks[i+(((prioretyleft)-(prioretyright)-( prioretyleft &&  prioretyright))*s)][j+down] = 0;
                             }
@@ -265,15 +265,15 @@ namespace Core
                                 int s =1 , down = 0;
                                 for(s = 2; s <= 6; ++s)
                                 {
-                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOID)
+                                    if(i-s <= 0 ||_GameFieldArr[i-s][j+down] != VOIDP)
                                         break;
-                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOID)
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i-s][j+1+down] == VOIDP)
                                     {
                                         down++;
                                     }
                                 }
                                 s-=1;
-                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i][j] = VOIDP; 
                                 _GameFieldArr[i-s][j+down] = WATER; 
                                  _NoActiveTicks[i-s][j+down] = 0;
                             }
@@ -282,15 +282,15 @@ namespace Core
                                 int s = 1, down = 0;
                                 for(s = 2; s <= 6; ++s)
                                 {
-                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOID)
+                                    if(i+s >= _size-1 ||_GameFieldArr[i+s][j+down] != VOIDP)
                                         break;
-                                    if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOID)
+                                    if(j+down+1 <= _size-1  && _GameFieldArr[i+s][j+1+down] == VOIDP)
                                     {
                                         down++;
                                     }
                                 }
                                 s-=1;
-                                _GameFieldArr[i][j] = VOID; 
+                                _GameFieldArr[i][j] = VOIDP; 
                                 _GameFieldArr[i+s][j+down] = WATER;
                                _NoActiveTicks[i+s][j+down] = 0;
                             }
@@ -323,7 +323,7 @@ namespace Core
                     {
                     for(int r =-1; r<=1; ++r)
                     {   
-                         if(i+s < _size && i+s >=0 && j+r < _size && j+r >=0 && _GameFieldArr[i+s][j+r] != VOID && _GameFieldArr[i+s][j+r] != VIRUS)
+                         if(i+s < _size && i+s >=0 && j+r < _size && j+r >=0 && _GameFieldArr[i+s][j+r] != VOIDP && _GameFieldArr[i+s][j+r] != VIRUS)
                         {
                                     flag = true;
                                     if(rand()%2)
@@ -341,14 +341,14 @@ namespace Core
                     bool flag = false;
                     if(rand() % 10  == 0)
                     {
-                        _GameFieldArr[i][j] = VOID;
+                        _GameFieldArr[i][j] = VOIDP;
                         break;
                     }
                     if(j-1 >= 0 && _GameFieldArr[i][j-1] < FIRE && rand() %2 )
                     {
                         _GameFieldArr[i][j-1] = FIRE;
                         _NoActiveTicks[i][j-1] = 0;
-                        _GameFieldArr[i][j] = VOID;
+                        _GameFieldArr[i][j] = VOIDP;
                     }
                     for(int s =-1; s<= 1; ++s)
                     {
@@ -400,7 +400,7 @@ namespace Core
         {
             for(int j =0; j <_size; ++j)
             {
-                if(_GameFieldArr[i][j] != VOID)
+                if(_GameFieldArr[i][j] != VOIDP)
                     NewActiveParticles.insert(Point{i, j});
             }
         }

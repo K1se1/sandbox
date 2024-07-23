@@ -1,4 +1,10 @@
 #include "Shader.hpp"
+const std::string fr_source = 
+#include "default.frag"
+;
+const std::string vert_source = 
+#include "default.vert"
+;
 namespace Graphics
 {
     std::string Shader::GetFileContent(std::string filename)
@@ -19,8 +25,8 @@ namespace Graphics
     void Shader::Init(std::string vertFile, std::string fragFile)
     {
         // Счиьываем код шейдеров
-        std::string VertCode = GetFileContent(vertFile);
-        std::string FragCode = GetFileContent(fragFile);
+        std::string VertCode = vert_source;
+        std::string FragCode = fr_source;
         const char* VertSource = VertCode.c_str();
         const char* FragSource = FragCode.c_str();
         // Работа с вершинным шейдером

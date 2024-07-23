@@ -33,12 +33,12 @@ namespace Graphics
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_DECORATED, false); // окно без рамок
-       // glfwSetInputMode(_window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
         _window = glfwCreateWindow(_width, _height, "SandBox", NULL, NULL);  // создание окна
         if(_window == NULL)
         {
             std::cout << "Failed create the window" << std::endl; // если не открылось аварийно завершаем
             glfwTerminate();
+            return;
         }
         glfwMakeContextCurrent(_window); // вводим окно в использование
         gladLoadGL();
@@ -46,7 +46,7 @@ namespace Graphics
         shader.Init("C:/sandbox/default.vert", "C:/sandbox/default.frag"); // подключаем шейдеры
         vao.Init();  // инициализируем массив вершин
         GLuint indices[] = {0, 1, 2,
-                            0, 2, 3 };
+                            0, 2, 3 };                 
         vao.Bind();
         ebo.Init(indices, sizeof(indices)); // инициализируем буффер обхода индексов 
         shader.Activate();

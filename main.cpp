@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         {
             for(int j =0; j < size; ++j)
                 {
-                    if(f[i][j]!= VOID) // отрисовываем только непустые клетки
+                    if(f[i][j]!= VOIDP) // отрисовываем только непустые клетки
                     {
                         if(f[i][j] == WATER)
                             color = RGBColor{0, 0, 1.f};
