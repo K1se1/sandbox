@@ -11,6 +11,8 @@
 #include<GLFW/glfw3.h>
 #include "InputProcessing.hpp"
 #include "Point.hpp"
+#include<mutex>
+#include<thread>
 // основной класс с логикой игры 
 namespace Core
 {
@@ -21,6 +23,7 @@ namespace Core
         std::vector<std::vector<int>> _GameFieldArr; // игровок поле
         std::vector<std::vector<int>> _NoActiveTicks; // массив активности частиц(используется для оптимизации)
         std::set<Point> _ActiveParticles; // множество активных частиц
+        std::mutex _m1;
         int _size; //  размер игрового поля
         public:
         GameField(GLFWwindow* window); 
@@ -29,6 +32,7 @@ namespace Core
         std::vector<std::vector<int>> DoTick(); // игровой тик
         void HardUpdate(); // Делает каждую частицу - активной
         int GetSize(); // принимаем размер
+        void ParticleHandler(int i, int j);
         ~GameField();
 
     };

@@ -88,6 +88,7 @@ namespace Graphics
         iVbo.Delete();
         quadVbo.Delete();
         vao.Delete();
+        ebo.Delete();
         delete[] translations;
         }
         glfwSwapBuffers(_window); // меняем местами передний и задний буффер

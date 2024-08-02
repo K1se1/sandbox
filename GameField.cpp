@@ -82,13 +82,56 @@ namespace Core
                 }
         }
         }
-        for(int k =0; k <1;++k)
-        {
+        std::vector<std::thread> threads;
         for(auto iter = _ActiveParticles.begin(); iter != _ActiveParticles.end(); ++iter)
         {
                 int i = iter->x;
                 int j = iter->y;
-                switch(_GameFieldArr[i][j])
+               // threads.push_back(std::thread(ParticleHandler, this, i, j));
+                ParticleHandler(i, j);
+        }
+        // for(auto& thread: threads)
+        //      thread.join();
+        std::set<Point> NewActiveParticles;
+        int counter = 0;
+        for(int i = 0; i < _size;++i)
+        {
+            for(int j =0; j < _size;++j)
+            {
+                if(_NoActiveTicks[i][j] < 3)
+                {
+                    NewActiveParticles.insert(Point{i, j});
+                    counter++;
+                }
+            }
+        }
+        _ActiveParticles = NewActiveParticles;
+        return _GameFieldArr;
+    }
+    
+    GameField::~GameField()
+    {}
+    void GameField::HardUpdate()
+    {
+        std::set<Point> NewActiveParticles;
+        for(int i =0; i <_size; ++i)
+        {
+            for(int j =0; j <_size; ++j)
+            {
+                if(_GameFieldArr[i][j] != VOIDP)
+                    NewActiveParticles.insert(Point{i, j});
+            }
+        }
+        _ActiveParticles = std::move(NewActiveParticles);
+    }
+    int GameField::GetSize()
+    {
+        return _size;
+    }
+    void GameField::ParticleHandler(int i, int j)
+    {
+        //std::lock_guard<std::mutex> lock(_m1);
+        switch(_GameFieldArr[i][j])
                 { 
                 case VOIDP:
                     _NoActiveTicks[i][j] = 100;
@@ -373,41 +416,4 @@ namespace Core
 
             }
         }
-        std::set<Point> NewActiveParticles;
-        int counter = 0;
-        for(int i = 0; i < _size;++i)
-        {
-            for(int j =0; j < _size;++j)
-            {
-                if(_NoActiveTicks[i][j] < 3)
-                {
-                    NewActiveParticles.insert(Point{i, j});
-                    counter++;
-                }
-            }
-        }
-        _ActiveParticles = NewActiveParticles;
-        }
-        return _GameFieldArr;
-    }
-    
-    GameField::~GameField()
-    {}
-    void GameField::HardUpdate()
-    {
-        std::set<Point> NewActiveParticles;
-        for(int i =0; i <_size; ++i)
-        {
-            for(int j =0; j <_size; ++j)
-            {
-                if(_GameFieldArr[i][j] != VOIDP)
-                    NewActiveParticles.insert(Point{i, j});
-            }
-        }
-        _ActiveParticles = std::move(NewActiveParticles);
-    }
-    int GameField::GetSize()
-    {
-        return _size;
-    }
 }
